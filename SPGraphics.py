@@ -429,6 +429,51 @@ class QuickShadow(QGraphicsDropShadowEffect):
         self.setColor(color)
 
 
+class QuickWidget(QWidget):
+    def __init__(
+            self, parent=None,
+            fixed_size: QSize = None,
+            fixed_width: int = None,
+            fixed_height: int = None,
+            value_changed: callable = None,
+            start_value: object = None,
+            end_value: object = None,
+            duration: int = 300
+    ):
+        super(QuickWidget, self).__init__(parent)
+
+        if fixed_size:
+            self.setFixedSize(fixed_size)
+        else:
+            if fixed_width:
+                self.setFixedWidth(fixed_width)
+            if fixed_height:
+                self.setFixedHeight(fixed_height)
+
+        if callable(value_changed) and start_value and end_value:
+            self.__animation = QVariantAnimation(self)
+            self.__animation.valueChanged.connect(value_changed)
+            self.__animation.setStartValue(start_value)
+            self.__animation.setEndValue(end_value)
+            self.__animation.setDuration(duration)
+        else:
+            self.__animation = None
+
+    def enterEvent(self, event):
+        super(QuickWidget, self).enterEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Forward)
+            self.__animation.start()
+
+    def leaveEvent(self, event):
+        super(QuickWidget, self).leaveEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Backward)
+            self.__animation.start()
+
+
 class QuickLineEdit(QLineEdit):
     def __init__(
             self, parent=None,
