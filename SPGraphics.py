@@ -474,6 +474,43 @@ class QuickWidget(QWidget):
             self.__animation.start()
 
 
+class QuickMainWidget(QWidget):
+    def __init__(
+            self, parent=None,
+            shadow: QGraphicsDropShadowEffect = QuickShadow(),
+            padding: int = 11,
+            fixed_size: QSize = None,
+            fixed_width: int = None,
+            fixed_height: int = None
+    ):
+        super(QuickMainWidget, self).__init__(parent)
+
+        self.setLayout(QGridLayout())
+        self.layout().setContentsMargins(padding, padding, padding, padding)
+
+        self.shadowWidget = QWidget(self, flags=Qt.SubWindow)
+        self.shadowWidget.setGraphicsEffect(shadow)
+        self.shadowWidget.setObjectName('shadowWidget')
+
+        self.mainWidget = QWidget(self, flags=Qt.SubWindow)
+        self.mainWidget.setObjectName('mainWidget')
+
+        self.layout().addWidget(self.shadowWidget, 0, 0, 1, 1)
+        self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
+
+        if fixed_size:
+            self.setFixedSize(fixed_size)
+        elif fixed_width or fixed_height:
+            if fixed_width:
+                self.setFixedWidth(fixed_width)
+            if fixed_height:
+                self.setFixedHeight(fixed_height)
+        else:
+            self.sizeGrip = QSizeGrip(self)
+            self.sizeGrip.setFixedSize(QSize(24, 24))
+            self.layout().addWidget(self.sizeGrip, 0, 0, 1, 1, Qt.AlignBottom | Qt.AlignRight)
+
+
 class QuickLineEdit(QLineEdit):
     def __init__(
             self, parent=None,
