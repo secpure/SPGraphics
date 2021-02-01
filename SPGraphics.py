@@ -511,6 +511,81 @@ class QuickMainWidget(QWidget):
             self.layout().addWidget(self.sizeGrip, 0, 0, 1, 1, Qt.AlignBottom | Qt.AlignRight)
 
 
+class QuickMenu(QMenu):
+    def __init__(
+            self, parent=None,
+            shadow: QGraphicsDropShadowEffect = QuickShadow(),
+            padding: int = 11,
+            margin_left: int = 11,
+            margin_top: int = 11,
+            fixed_size: QSize = None,
+            fixed_width: int = None,
+            fixed_height: int = None,
+            resizable: bool = False
+    ):
+        super(QuickMenu, self).__init__(parent)
+
+        self.setWindowFlags(
+            self.windowFlags() | Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setLayout(QGridLayout())
+        self.layout().setContentsMargins(padding, padding, padding, padding)
+
+        self.shadowWidget = QWidget(self, flags=Qt.SubWindow)
+        self.shadowWidget.setGraphicsEffect(shadow)
+        self.shadowWidget.setObjectName('shadowWidget')
+
+        self.mainWidget = QWidget(self, flags=Qt.SubWindow)
+        self.mainWidget.setObjectName('mainWidget')
+
+        self.marginLeft = margin_left
+        self.marginTop = margin_top
+
+        self.layout().addWidget(self.shadowWidget, 0, 0, 1, 1)
+        self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
+
+        if fixed_size:
+            self.setFixedSize(fixed_size)
+        elif fixed_width or fixed_height:
+            if fixed_width:
+                self.setFixedWidth(fixed_width)
+            if fixed_height:
+                self.setFixedHeight(fixed_height)
+        elif resizable:
+            self.sizeGrip = QSizeGrip(self)
+            self.sizeGrip.setFixedSize(QSize(24, 24))
+            self.layout().addWidget(self.sizeGrip, 0, 0, 1, 1, Qt.AlignBottom | Qt.AlignRight)
+
+    def exec_(self, *__args):
+        point = None
+        __args = list(__args)
+
+        for index, arg in enumerate(__args):
+            if isinstance(arg, QPoint):
+                point = __args.pop(index)
+                break
+
+        self.mainWidget.adjustSize()
+        self.adjustSize()
+
+        if not point:
+            point = QCursor().pos()
+            desktop_geometry = QDesktopWidget().screenGeometry()
+
+            if (desktop_geometry.width() - point.x()) < self.width():
+                point.setX(point.x() - self.width())
+            else:
+                point.setX(point.x() + self.marginLeft)
+
+            if (desktop_geometry.height() - point.y()) < self.height():
+                point.setY(point.y() - self.height())
+            else:
+                point.setY(point.y() + self.marginTop)
+
+        super(QuickMenu, self).exec_(*[point], *__args)
+
+
 class QuickDialog(QDialog):
     def __init__(
             self, parent=None,
@@ -1330,10 +1405,11 @@ class QLoadingEffect(QWidget):
         self.__animation.temp_close(duration=500, finished=self.close).start()
 
 
-class QMarkNotify(QLabel):
+class QMarkNotify(QWidget):
     def __init__(self, parent):
-        super(QMarkNotify, self).__init__(parent)
+        super(QMarkNotify, self).__init__(parent, flags=Qt.SubWindow)
 
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.setFixedSize(QSize(10, 10))
         super(QMarkNotify, self).hide()
 
@@ -1363,10 +1439,11 @@ class QMarkNotify(QLabel):
         self.__animation.start()
 
 
-class QBorderBottom(QLabel):
+class QBorderBottom(QWidget):
     def __init__(self, parent):
-        super(QBorderBottom, self).__init__(parent)
+        super(QBorderBottom, self).__init__(parent, flags=Qt.SubWindow)
 
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.__animation = GeometryMotion(self)
 
     def move_to_x(self, x: int):
