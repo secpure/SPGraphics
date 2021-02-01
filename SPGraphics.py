@@ -1330,10 +1330,11 @@ class QLoadingEffect(QWidget):
         self.__animation.temp_close(duration=500, finished=self.close).start()
 
 
-class QMarkNotify(QLabel):
+class QMarkNotify(QWidget):
     def __init__(self, parent):
-        super(QMarkNotify, self).__init__(parent)
+        super(QMarkNotify, self).__init__(parent, flags=Qt.SubWindow)
 
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.setFixedSize(QSize(10, 10))
         super(QMarkNotify, self).hide()
 
@@ -1363,10 +1364,11 @@ class QMarkNotify(QLabel):
         self.__animation.start()
 
 
-class QBorderBottom(QLabel):
+class QBorderBottom(QWidget):
     def __init__(self, parent):
-        super(QBorderBottom, self).__init__(parent)
+        super(QBorderBottom, self).__init__(parent, flags=Qt.SubWindow)
 
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.__animation = GeometryMotion(self)
 
     def move_to_x(self, x: int):
