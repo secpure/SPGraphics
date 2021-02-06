@@ -21,14 +21,15 @@ SECPure.manifest
 | Return | Method | Description |
 | --- | --- | --- |
 | str | `LINE_EDIT_PLACEHOLDER` | The message box placeholder **Confirm your password** by default |
+| Qt.TextElideMode | `LAYOUT_DIRECTION` | The message box layout direction |
 | None | [`text_ellipsis`](#text_ellipsis-Function) | Make ellipsis effect for any object text supported like QLabel |
 | None | [`smooth_scroll`](#smooth_scroll-Function) | Make smooth scrolling for any object scroll supported like QListWidget |
 | None | [`combobox_style`](#combobox_style-Function) | Make new combobox style |
-| State | [`State`](#State-Properties) | Status of message display |
-| Setup | [`Setup`](#Setup-Methods) | Setup required |
 | MessageBoxButtonObject | `MessageBoxButtonObject` | Messagebox button data type |
+| State | [`State`](#State-Properties) | Status of message display |
 | Button | [`Button`](#Button-Properties) | Buttons types for clicks |
 | Property | [`Property`](#Property-Properties) | The property for Animation objects |
+| Setup | [`Setup`](#Setup-Methods) | Setup required |
 | QPropertyAnimation | [`OpacityMotion`](#OpacityMotion-Methods) | Opacity motion graphics |
 | QPropertyAnimation | [`GeometryMotion`](#GeometryMotion-Methods) | Geometry motion graphics |
 | QPropertyAnimation | [`MaximumWidthMotion`](#MaximumWidthMotion-Methods) | Maximum width motion graphics |
@@ -272,7 +273,7 @@ None                  start()
 ```
 
 ## QuickLineEdit Methods:
->Quick to create QlineEdit object, Set `Qt.NoContextMenu by` default
+>Quick to create QlineEdit object, Set `Qt.NoContextMenu` by default
 ```py
 QLineEdit   QuickLineEdit(
               QObject parent=None,
