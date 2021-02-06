@@ -478,7 +478,7 @@ class QuickMainWidget(QWidget):
     def __init__(
             self, parent=None,
             shadow: QGraphicsDropShadowEffect = QuickShadow(),
-            padding: int = 11,
+            margin: int = 11,
             fixed_size: QSize = None,
             fixed_width: int = None,
             fixed_height: int = None
@@ -486,7 +486,7 @@ class QuickMainWidget(QWidget):
         super(QuickMainWidget, self).__init__(parent)
 
         self.setLayout(QGridLayout())
-        self.layout().setContentsMargins(padding, padding, padding, padding)
+        self.layout().setContentsMargins(margin, margin, margin, margin)
 
         self.shadowWidget = QWidget(self, flags=Qt.SubWindow)
         self.shadowWidget.setGraphicsEffect(shadow)
@@ -515,7 +515,7 @@ class QuickMenu(QMenu):
     def __init__(
             self, parent=None,
             shadow: QGraphicsDropShadowEffect = QuickShadow(),
-            padding: int = 11,
+            margin: int = 11,
             margin_left: int = 11,
             margin_top: int = 11,
             fixed_size: QSize = None,
@@ -530,7 +530,7 @@ class QuickMenu(QMenu):
         )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setLayout(QGridLayout())
-        self.layout().setContentsMargins(padding, padding, padding, padding)
+        self.layout().setContentsMargins(margin, margin, margin, margin)
 
         self.shadowWidget = QWidget(self, flags=Qt.SubWindow)
         self.shadowWidget.setGraphicsEffect(shadow)
@@ -590,7 +590,7 @@ class QuickDialog(QDialog):
     def __init__(
             self, parent=None,
             shadow: QGraphicsDropShadowEffect = QuickShadow(),
-            padding: int = 11,
+            margin: int = 11,
             fixed_size: QSize = None,
             fixed_width: int = None,
             fixed_height: int = None
@@ -598,7 +598,7 @@ class QuickDialog(QDialog):
         super(QuickDialog, self).__init__(parent)
 
         self.setLayout(QGridLayout())
-        self.layout().setContentsMargins(padding, padding, padding, padding)
+        self.layout().setContentsMargins(margin, margin, margin, margin)
 
         self.shadowWidget = QWidget(self, flags=Qt.SubWindow)
         self.shadowWidget.setGraphicsEffect(shadow)
@@ -814,7 +814,8 @@ class QuickLineEdit(QLineEdit):
             value_changed: callable = None,
             start_value: object = None,
             end_value: object = None,
-            duration: int = 300
+            duration: int = 300,
+            tooltip: QuickToolTip = None
     ):
         super(QuickLineEdit, self).__init__(parent)
         self.setContextMenuPolicy(Qt.NoContextMenu)
@@ -860,6 +861,8 @@ class QuickLineEdit(QLineEdit):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickLineEdit, self).enterEvent(event)
 
@@ -867,12 +870,18 @@ class QuickLineEdit(QLineEdit):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickLineEdit, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickLabel(QLabel):
@@ -890,7 +899,8 @@ class QuickLabel(QLabel):
             value_changed: callable = None,
             start_value: object = None,
             end_value: object = None,
-            duration: int = 300
+            duration: int = 300,
+            tooltip: QuickToolTip = None
     ):
         super(QuickLabel, self).__init__(parent)
         self.setWordWrap(True)
@@ -918,6 +928,8 @@ class QuickLabel(QLabel):
 
         if pixmap:
             self.setPixmap(pixmap)
+
+        if scaled:
             self.setScaledContents(scaled)
 
         if align:
@@ -932,6 +944,8 @@ class QuickLabel(QLabel):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickLabel, self).enterEvent(event)
 
@@ -939,12 +953,18 @@ class QuickLabel(QLabel):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickLabel, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickPushButton(QPushButton):
@@ -961,7 +981,8 @@ class QuickPushButton(QPushButton):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None
+            cursor: Qt.CursorShape = None,
+            tooltip: QuickToolTip = None
     ):
         super(QuickPushButton, self).__init__(parent)
         self.setFocusPolicy(Qt.NoFocus)
@@ -999,6 +1020,8 @@ class QuickPushButton(QPushButton):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickPushButton, self).enterEvent(event)
 
@@ -1006,12 +1029,18 @@ class QuickPushButton(QPushButton):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickPushButton, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickRadioButton(QRadioButton):
@@ -1029,7 +1058,8 @@ class QuickRadioButton(QRadioButton):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None
+            cursor: Qt.CursorShape = None,
+            tooltip: QuickToolTip = None
     ):
         super(QuickRadioButton, self).__init__(parent)
         self.setFocusPolicy(Qt.NoFocus)
@@ -1070,6 +1100,8 @@ class QuickRadioButton(QRadioButton):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickRadioButton, self).enterEvent(event)
 
@@ -1077,12 +1109,18 @@ class QuickRadioButton(QRadioButton):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickRadioButton, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickCheckBox(QCheckBox):
@@ -1101,7 +1139,8 @@ class QuickCheckBox(QCheckBox):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None
+            cursor: Qt.CursorShape = None,
+            tooltip: QuickToolTip = None
     ):
         super(QuickCheckBox, self).__init__(parent)
         self.setFocusPolicy(Qt.NoFocus)
@@ -1143,6 +1182,8 @@ class QuickCheckBox(QCheckBox):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickCheckBox, self).enterEvent(event)
 
@@ -1150,12 +1191,18 @@ class QuickCheckBox(QCheckBox):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickCheckBox, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickDateEdit(QDateEdit):
@@ -1173,7 +1220,8 @@ class QuickDateEdit(QDateEdit):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None
+            cursor: Qt.CursorShape = None,
+            tooltip: QuickToolTip = None
     ):
         super(QuickDateEdit, self).__init__(parent)
         self.setContextMenuPolicy(Qt.NoContextMenu)
@@ -1217,6 +1265,8 @@ class QuickDateEdit(QDateEdit):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickDateEdit, self).enterEvent(event)
 
@@ -1224,12 +1274,18 @@ class QuickDateEdit(QDateEdit):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickDateEdit, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Wheel:
@@ -1320,7 +1376,8 @@ class QuickComboBox(QComboBox):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None
+            cursor: Qt.CursorShape = None,
+            tooltip: QuickToolTip = None
     ):
         super(QuickComboBox, self).__init__(parent)
         self.setFocusPolicy(Qt.NoFocus)
@@ -1372,6 +1429,8 @@ class QuickComboBox(QComboBox):
         else:
             self.__animation = None
 
+        self.__tooltip = tooltip
+
     def enterEvent(self, event):
         super(QuickComboBox, self).enterEvent(event)
 
@@ -1379,12 +1438,18 @@ class QuickComboBox(QComboBox):
             self.__animation.setDirection(QAbstractAnimation.Forward)
             self.__animation.start()
 
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
     def leaveEvent(self, event):
         super(QuickComboBox, self).leaveEvent(event)
 
         if self.__animation:
             self.__animation.setDirection(QAbstractAnimation.Backward)
             self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
 
 
 class QuickNotification(QListWidget):
