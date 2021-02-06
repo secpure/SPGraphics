@@ -671,6 +671,9 @@ class QuickToolTip(QWidget):
         self.__margin = margin
         self.__timeout = timeout
         self.__painterPath = QPainterPath()
+        self.__timer = QTimer()
+        self.__timer.timeout.connect(self.timerEvent)
+        self.__timer.count = 0
 
         self.__set_alignment()
 
@@ -747,6 +750,18 @@ class QuickToolTip(QWidget):
 
         self.labelArrow.setPixmap(pix)
 
+    def timerEvent(self):
+        self.__timer.count += 1000
+        if self.__timer.count >= self.__timeout:
+            self.hide()
+
+    def hideEvent(self, event):
+        if self.__timeout:
+            self.__timer.count = 0
+            self.__timer.stop()
+        
+        super(QuickToolTip, self).hideEvent(event)
+
     def exec_(self, target):
         point = target.mapToGlobal(QPoint())
         x = point.x()
@@ -794,7 +809,7 @@ class QuickToolTip(QWidget):
         self.show()
 
         if self.__timeout:
-            QTimer().singleShot(self.__timeout, self.hide)
+            self.__timer.start(1000)
 
 
 class QuickLineEdit(QLineEdit):
