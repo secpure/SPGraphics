@@ -623,6 +623,180 @@ class QuickDialog(QDialog):
             self.layout().addWidget(self.sizeGrip, 0, 0, 1, 1, Qt.AlignBottom | Qt.AlignRight)
 
 
+class QuickToolTip(QWidget):
+    def __init__(
+            self, parent=None,
+            text: str = None,
+            font_size: int = None,
+            scaled: bool = False,
+            pixmap: QPixmap = None,
+            text_align: Qt.AlignmentFlag = None,
+            align: Qt.AlignmentFlag = Qt.AlignBottom,
+            arrow_align: Qt.AlignmentFlag = Qt.AlignCenter,
+            arrow_size: QSize = QSize(15, 8),
+            arrow_padding: int = 15,
+            margin: int = 11,
+            timeout: int = 5000
+    ):
+        super(QuickToolTip, self).__init__(parent, flags=Qt.ToolTip | Qt.FramelessWindowHint)
+
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setLayout(QGridLayout())
+        self.layout().setSpacing(0)
+
+        self.labelArrow = QLabel(self)
+
+        self.mainWidget = QWidget(self, flags=Qt.SubWindow)
+        self.mainWidget.setAttribute(Qt.WA_StyledBackground)
+        self.mainWidget.setLayout(QGridLayout())
+        self.mainWidget.setObjectName('mainWidget')
+
+        if pixmap or scaled:
+            self.labelIcon = QuickLabel(
+                self, scaled=scaled, pixmap=pixmap, align=Qt.AlignCenter
+            )
+            self.mainWidget.layout().addWidget(self.labelIcon, 0, 0, 1, 1, Qt.AlignTop)
+
+        if text or font_size or text_align:
+            count = self.mainWidget.layout().count()
+            self.labelText = QuickLabel(
+                self, text=text, font_size=font_size, align=text_align
+            )
+            self.mainWidget.layout().addWidget(self.labelText, 0, count, 1, 1)
+
+        self.__alignment = align
+        self.__arrowAlign = arrow_align
+        self.__arrowSize = arrow_size
+        self.__arrowPadding = arrow_padding
+        self.__margin = margin
+        self.__timeout = timeout
+        self.__painterPath = QPainterPath()
+
+        self.__set_alignment()
+
+    def __set_alignment(self):
+        if self.__alignment is Qt.AlignTop:
+            self.__arrowSize.setWidth((self.__arrowPadding * 2) + self.__arrowSize.width())
+
+            self.__painterPath.moveTo(self.__arrowSize.width() / 2, self.__arrowSize.height())
+            self.__painterPath.lineTo(self.__arrowPadding, 0)
+            self.__painterPath.lineTo(self.__arrowSize.width() - self.__arrowPadding, 0)
+
+            self.layout().setContentsMargins(0, 0, 0, self.__arrowPadding)
+            self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
+            self.layout().addWidget(self.labelArrow, 1, 0, 1, 1, self.__arrowAlign)
+
+        elif self.__alignment is Qt.AlignBottom:
+            self.__arrowSize.setWidth((self.__arrowPadding * 2) + self.__arrowSize.width())
+
+            self.__painterPath.moveTo(self.__arrowSize.width() / 2, 0)
+            self.__painterPath.lineTo(self.__arrowPadding, self.__arrowSize.height())
+            self.__painterPath.lineTo(
+                self.__arrowSize.width() - self.__arrowPadding, self.__arrowSize.height()
+            )
+
+            self.layout().setContentsMargins(0, self.__arrowPadding, 0, 0)
+            self.layout().addWidget(self.labelArrow, 0, 0, 1, 1, self.__arrowAlign)
+            self.layout().addWidget(self.mainWidget, 1, 0, 1, 1)
+
+        elif self.__alignment is Qt.AlignLeft:
+            self.__arrowSize.setHeight((self.__arrowPadding * 2) + self.__arrowSize.height())
+
+            self.__painterPath.moveTo(self.__arrowSize.width(), self.__arrowSize.height() / 2)
+            self.__painterPath.lineTo(0, self.__arrowSize.height() - self.__arrowPadding)
+            self.__painterPath.lineTo(0, self.__arrowPadding)
+
+            self.layout().setContentsMargins(0, 0, self.__arrowPadding, 0)
+            self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
+            self.layout().addWidget(self.labelArrow, 0, 1, 1, 1, self.__arrowAlign)
+
+        elif self.__alignment is Qt.AlignRight:
+            self.__arrowSize.setHeight((self.__arrowPadding * 2) + self.__arrowSize.height())
+
+            self.__painterPath.moveTo(0, self.__arrowSize.height() / 2)
+            self.__painterPath.lineTo(
+                self.__arrowSize.width(), self.__arrowSize.height() - self.__arrowPadding
+            )
+            self.__painterPath.lineTo(self.__arrowSize.width(), self.__arrowPadding)
+
+            self.layout().setContentsMargins(self.__arrowPadding, 0, 0, 0)
+            self.layout().addWidget(self.labelArrow, 0, 0, 1, 1, self.__arrowAlign)
+            self.layout().addWidget(self.mainWidget, 0, 1, 1, 1)
+
+        self.labelArrow.setFixedSize(self.__arrowSize)
+
+    def __size(self):
+        self.mainWidget.adjustSize()
+
+        if self.__alignment in (Qt.AlignTop, Qt.AlignBottom):
+            return QSize(self.mainWidget.width(), self.mainWidget.height() + self.__margin)
+
+        elif self.__alignment in (Qt.AlignLeft, Qt.AlignRight):
+            return QSize(self.mainWidget.width() + self.__margin, self.mainWidget.height())
+
+    def __arrow_draw(self):
+        pix = QPixmap(self.labelArrow.size())
+        pix.fill(Qt.transparent)
+
+        painter = QPainter(pix)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(self.mainWidget.palette().window().color())
+        painter.setPen(QPen(QBrush(Qt.transparent), 1))
+        painter.drawPath(self.__painterPath)
+        painter.end()
+
+        self.labelArrow.setPixmap(pix)
+
+    def exec_(self, target):
+        point = target.mapToGlobal(QPoint())
+        x = point.x()
+        y = point.y()
+        size = self.__size()
+
+        if self.__alignment is Qt.AlignTop:
+            y -= size.height()
+            if self.__arrowAlign is Qt.AlignLeft:
+                x -= self.__arrowPadding
+            elif self.__arrowAlign is Qt.AlignRight:
+                x += target.width() + self.__arrowPadding - size.width()
+            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignHCenter):
+                x += (target.width() / 2) - (size.width() / 2)
+
+        elif self.__alignment is Qt.AlignBottom:
+            y += target.height()
+            if self.__arrowAlign is Qt.AlignLeft:
+                x -= self.__arrowPadding
+            elif self.__arrowAlign is Qt.AlignRight:
+                x += target.width() + self.__arrowPadding - size.width()
+            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignHCenter):
+                x += (target.width() / 2) - (size.width() / 2)
+
+        elif self.__alignment is Qt.AlignLeft:
+            x -= size.width()
+            if self.__arrowAlign is Qt.AlignTop:
+                y -= self.__arrowPadding
+            elif self.__arrowAlign is Qt.AlignBottom:
+                y += target.height() + self.__arrowPadding - size.height()
+            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignVCenter):
+                y += (target.height() / 2) - (size.height() / 2)
+
+        elif self.__alignment is Qt.AlignRight:
+            x += target.width()
+            if self.__arrowAlign is Qt.AlignTop:
+                y -= self.__arrowPadding
+            elif self.__arrowAlign is Qt.AlignBottom:
+                y += target.height() + self.__arrowPadding - size.height()
+            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignVCenter):
+                y += (target.height() / 2) - (size.height() / 2)
+
+        self.__arrow_draw()
+        self.move(x, y)
+        self.show()
+
+        if self.__timeout:
+            QTimer().singleShot(self.__timeout, self.hide)
+
+
 class QuickLineEdit(QLineEdit):
     def __init__(
             self, parent=None,
