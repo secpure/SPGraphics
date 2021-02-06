@@ -21,18 +21,24 @@ SECPure.manifest
 | Return | Method | Description |
 | --- | --- | --- |
 | str | `LINE_EDIT_PLACEHOLDER` | The message box placeholder **Confirm your password** by default |
+| Qt.TextElideMode | `LAYOUT_DIRECTION` | The message box layout direction |
 | None | [`text_ellipsis`](#text_ellipsis-Function) | Make ellipsis effect for any object text supported like QLabel |
 | None | [`smooth_scroll`](#smooth_scroll-Function) | Make smooth scrolling for any object scroll supported like QListWidget |
 | None | [`combobox_style`](#combobox_style-Function) | Make new combobox style |
-| State | [`State`](#State-Properties) | Status of message display |
-| Setup | [`Setup`](#Setup-Methods) | Setup required |
 | MessageBoxButtonObject | `MessageBoxButtonObject` | Messagebox button data type |
+| State | [`State`](#State-Properties) | Status of message display |
 | Button | [`Button`](#Button-Properties) | Buttons types for clicks |
 | Property | [`Property`](#Property-Properties) | The property for Animation objects |
+| Setup | [`Setup`](#Setup-Methods) | Setup required |
 | QPropertyAnimation | [`OpacityMotion`](#OpacityMotion-Methods) | Opacity motion graphics |
 | QPropertyAnimation | [`GeometryMotion`](#GeometryMotion-Methods) | Geometry motion graphics |
 | QPropertyAnimation | [`MaximumWidthMotion`](#MaximumWidthMotion-Methods) | Maximum width motion graphics |
 | QGraphicsDropShadowEffect | [`QuickShadow`](#QuickShadow-Methods) | Set shadow effect on window |
+| QWidget | [`QuickWidget`](#QuickWidget-Methods) | Quick to create QWidget |
+| QWidget | [`QuickMainWidget`](#QuickMainWidget-Methods) | Quick to create QWidget for main interface, Shadow drop supported |
+| QMenu | [`QuickMenu`](#QuickMenu-Methods) | Quick to create QMenu, Shadow drop supported |
+| QDialog | [`QuickDialog`](#QuickDialog-Methods) | Quick to create QDialog, Shadow drop supported |
+| QWidget | [`QuickToolTip`](#QuickToolTip-Methods) | Quick to create tooltip, Arrow supported |
 | QLineEdit | [`QuickLineEdit`](#QuickLineEdit-Methods) | Quick to create QlineEdit object, Set Qt.NoContextMenu by default |
 | QLabel | [`QuickLabel`](#QuickLabel-Methods) | Quick to create QLabel object, Set `setWordWrap(True)` by default |
 | QPushButton | [`QuickPushButton`](#QuickPushButton-Methods) | Quick to create QPushButton object, Set `setFocusPolicy(Qt.NoFocus)` by default |
@@ -271,8 +277,95 @@ QPropertyAnimation    temp_hide(
 None                  start()
 ```
 
+## QuickShadow Methods:
+>Set shadow effect on window
+```py
+QGraphicsDropShadowEffect   QuickShadow(
+                              QObject parent=None,
+                              QColor	color=QColor(0, 0, 0, 150),
+                              int radius=5,
+                              int offset=3
+                            )
+```
+
+## QuickWidget Methods:
+>Quick to create QWidget
+```py
+QWidget   QuickWidget(
+            QObject parent=None,
+            QSize fixed_size=None,
+            int fixed_width=None,
+            int fixed_height=None,
+            callable value_changed=None,
+            object start_value=None,
+            object end_value=None,
+            int duration=300
+          )
+```
+
+## QuickMainWidget Methods:
+>Quick to create QWidget for main interface, Shadow drop supported
+```py
+QWidget   QuickMainWidget(
+            QObject parent=None,
+            QGraphicsDropShadowEffect shadow=QuickShadow(),
+            int margin=11,
+            QSize fixed_size=None,
+            int fixed_width=None,
+            int fixed_height=None
+          )
+```
+
+## QuickMenu Methods:
+>Quick to create QMenu, Shadow drop supported
+```py
+QMenu   QuickMenu(
+            QObject parent=None,
+            QGraphicsDropShadowEffect shadow=QuickShadow(),
+            int margin=11,
+            int margin_left=11,
+            int margin_top=11,
+            QSize fixed_size=None,
+            int fixed_width=None,
+            int fixed_height=None,
+            bool resizable=False
+          )
+```
+
+## QuickDialog Methods:
+>Quick to create QDialog, Shadow drop supported
+```py
+QDialog   QuickDialog(
+            QObject parent=None,
+            QGraphicsDropShadowEffect shadow=QuickShadow(),
+            int margin=11,
+            QSize fixed_size=None,
+            int fixed_width=None,
+            int fixed_height=None
+          )
+```
+
+## QuickToolTip Methods:
+>Quick to create tooltip, Arrow supported
+```py
+QWidget   QuickToolTip(
+            QObject parent=None,
+            str text=None,
+            int font_size=None,
+            bool scaled=False,
+            QPixmap pixmap=None,
+            Qt.AlignmentFlag text_align=None,
+            Qt.AlignmentFlag align=Qt.AlignBottom,
+            Qt.AlignmentFlag arrow_align=Qt.AlignCenter,
+            QSize arrow_size=QSize(15, 8),
+            int arrow_padding=15,
+            int margin=11,
+            int timeout=1000
+          )
+```
+
 ## QuickLineEdit Methods:
->Quick to create QlineEdit object, Set `Qt.NoContextMenu by` default
+>Quick to create QlineEdit object, Set `Qt.NoContextMenu` by default
 ```py
 QLineEdit   QuickLineEdit(
               QObject parent=None,
@@ -290,7 +383,8 @@ QLineEdit   QuickLineEdit(
               callable value_changed=None,
               object start_value=None,
               object end_value=None,
-              int duration=300
+              int duration=300,
+              QuickToolTip tooltip=None
             )
 ```
 
@@ -311,7 +405,8 @@ QLabel    QuickLabel(
             callable value_changed=None,
             object start_value=None,
             object end_value=None,
-            int duration=300
+            int duration=300,
+            QuickToolTip tooltip=None
           )
 ```
 
@@ -331,7 +426,8 @@ QPushButton   QuickPushButton(
                 object start_value=None,
                 object end_value=None,
                 int duration=300,
-                Qt.CursorShape cursor=None
+                Qt.CursorShape cursor=None,
+                QuickToolTip tooltip=None
               )
 ```
 
@@ -352,7 +448,8 @@ QPushButton   QuickRadioButton(
                 object start_value=None,
                 object end_value=None,
                 int duration=300,
-                Qt.CursorShape cursor=None
+                Qt.CursorShape cursor=None,
+                QuickToolTip tooltip=None
               )
 ```
 
@@ -374,7 +471,8 @@ QCheckBox   QuickCheckBox(
               object start_value=None,
               object end_value=None,
               int duration=300,
-              Qt.CursorShape cursor=None
+              Qt.CursorShape cursor=None,
+              QuickToolTip tooltip=None
             )
 ```
 
@@ -395,7 +493,8 @@ QDateEdit   QuickDateEdit(
               object start_value=None,
               object end_value=None,
               int duration=300,
-              Qt.CursorShape cursor=None
+              Qt.CursorShape cursor=None,
+              QuickToolTip tooltip=None
             )
 ```
 
@@ -439,7 +538,8 @@ QComboBox   QuickComboBox(
               object start_value=None,
               object end_value=None,
               int duration=300,
-              Qt.CursorShape cursor=None
+              Qt.CursorShape cursor=None,
+              QuickToolTip tooltip=None
             )
 ```
 
@@ -615,7 +715,7 @@ None    content_update(
 | QGroupBox | `groupBoxContent` | Message content icon + text |
 | QLabel | `labelIcon` | Message icon |
 | QLabel | `labelMessage` | Message text |
-| any | `issue` | Use this var for the error store |
+| object | `issue` | Use this var for the error store |
 | MessageBoxButtonObject | `ClickedOn` | Button clicked |
 
 ## MessageBoxConfirm Methods:
