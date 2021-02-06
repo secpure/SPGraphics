@@ -71,7 +71,8 @@ class Main(SPGraphics.QuickMainWidget):
             value_changed=self.animate,
             start_value=QColor(Qt.white),
             end_value=QColor(Qt.yellow),
-            cursor=Qt.PointingHandCursor
+            cursor=Qt.PointingHandCursor,
+            tooltip=self.tooltip
         )
         self.pushButton.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
 
@@ -93,7 +94,8 @@ class Main(SPGraphics.QuickMainWidget):
             text='Push Button',
             icon=QIcon('icon.png'),
             icon_size=QSize(24, 24),
-            cursor=Qt.PointingHandCursor
+            cursor=Qt.PointingHandCursor,
+            tooltip=self.tooltip2
         )
         self.pushButton2.setLayout(QHBoxLayout())
         self.pushButton2.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
@@ -133,7 +135,8 @@ class Main(SPGraphics.QuickMainWidget):
             arrow_size=QSize(50, 10),
             arrow_padding=10,
             margin=80,
-            arrow_align=Qt.AlignBottom
+            arrow_align=Qt.AlignBottom,
+            timeout=1000
         )
 
         self.pushButton3 = SPGraphics.QuickPushButton(
@@ -141,7 +144,8 @@ class Main(SPGraphics.QuickMainWidget):
             text='Push Button',
             icon=QIcon('icon.png'),
             icon_size=QSize(24, 24),
-            cursor=Qt.PointingHandCursor
+            cursor=Qt.PointingHandCursor,
+            tooltip=self.tooltip3
         )
         self.pushButton3.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
 
@@ -151,10 +155,7 @@ class Main(SPGraphics.QuickMainWidget):
         self.pushButton2.layout().addWidget(self.mark, alignment=Qt.AlignTop | Qt.AlignRight)
 
         self.pushButton.clicked.connect(self.dialog.exec_)
-        self.pushButton.installEventFilter(self)
         self.pushButton2.clicked.connect(self.push_button)
-        self.pushButton2.installEventFilter(self)
-        self.pushButton3.installEventFilter(self)
 
     def mousePressEvent(self, event):
         super(Main, self).mousePressEvent(event)
@@ -176,25 +177,6 @@ class Main(SPGraphics.QuickMainWidget):
             x = event.globalPos().x() - self.__clickPressedX
             y = event.globalPos().y() - self.__clickPressedY
             self.move(x, y)
-
-    def eventFilter(self, source, event):
-        if event.type() == QEvent.HoverEnter:
-            if source is self.pushButton:
-                self.tooltip.exec_(source)
-            elif source is self.pushButton2:
-                self.tooltip2.exec_(source)
-            elif source is self.pushButton3:
-                self.tooltip3.exec_(source)
-
-        elif event.type() == QEvent.HoverLeave:
-            if source is self.pushButton:
-                self.tooltip.hide()
-            elif source is self.pushButton2:
-                self.tooltip2.hide()
-            elif source is self.pushButton3:
-                self.tooltip3.hide()
-
-        return super(Main, self).eventFilter(source, event)
 
     def animate(self, value):
         sender = self.sender()
