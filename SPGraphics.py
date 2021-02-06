@@ -23,7 +23,7 @@ LINE_EDIT_PLACEHOLDER = "Confirm your password"
 LAYOUT_DIRECTION = Qt.LeftToRight
 
 
-def text_ellipsis(target, mode=Qt.ElideRight, width: int = None):
+def text_ellipsis(target, mode: Qt.TextElideMode = Qt.ElideRight, width: int = None):
     text = target.text()
     if not width:
         width = target.contentsRect().width()
