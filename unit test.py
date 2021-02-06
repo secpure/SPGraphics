@@ -3,7 +3,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 import SPGraphics
-import menu
 
 
 style = '''
@@ -106,7 +105,7 @@ class Main(SPGraphics.QuickMainWidget):
         self.menu = SPGraphics.QuickMenu(
             parent=self.mainWidget,
             shadow=SPGraphics.QuickShadow(radius=20, offset=0),
-            padding=20,
+            margin=20,
             margin_top=0,
             margin_left=0
         )
