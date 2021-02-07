@@ -666,7 +666,7 @@ class QuickToolTip(QWidget):
 
         self.__alignment = align
         self.__arrowAlign = arrow_align
-        self.__arrowSize = arrow_size
+        self.__arrowSize = QSize(arrow_size)
         self.__arrowPadding = arrow_padding
         self.__margin = margin
         self.__timeout = timeout
