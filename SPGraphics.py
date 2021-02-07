@@ -23,7 +23,10 @@ LINE_EDIT_PLACEHOLDER = "Confirm your password"
 LAYOUT_DIRECTION = Qt.LeftToRight
 
 
-def text_ellipsis(target, mode: Qt.TextElideMode = Qt.ElideRight, width: int = None):
+def text_ellipsis(
+        target, mode: Qt.TextElideMode = Qt.ElideRight,
+        tooltip: bool = False, width: int = None
+):
     text = target.text()
     if not width:
         width = target.contentsRect().width()
@@ -32,7 +35,9 @@ def text_ellipsis(target, mode: Qt.TextElideMode = Qt.ElideRight, width: int = N
     if metrics.width(text) > width:
         elided = metrics.elidedText(text, mode, width)
         target.setText(elided)
-        target.setToolTip(text)
+
+        if tooltip:
+            target.setToolTip(text)
 
 
 def smooth_scroll(target, step: int = 8):
@@ -635,7 +640,7 @@ class QuickToolTip(QWidget):
             arrow_align: Qt.AlignmentFlag = Qt.AlignCenter,
             arrow_size: QSize = QSize(15, 8),
             arrow_padding: int = 15,
-            margin: int = 11,
+            margin: int = 10,
             timeout: int = 5000
     ):
         super(QuickToolTip, self).__init__(parent, flags=Qt.ToolTip | Qt.FramelessWindowHint)
@@ -678,6 +683,9 @@ class QuickToolTip(QWidget):
         self.__set_alignment()
 
     def __set_alignment(self):
+        if self.__arrowAlign in (Qt.AlignCenter, Qt.AlignHCenter, Qt.AlignVCenter):
+            self.__arrowPadding = 0
+
         if self.__alignment is Qt.AlignTop:
             self.__arrowSize.setWidth((self.__arrowPadding * 2) + self.__arrowSize.width())
 
@@ -685,7 +693,7 @@ class QuickToolTip(QWidget):
             self.__painterPath.lineTo(self.__arrowPadding, 0)
             self.__painterPath.lineTo(self.__arrowSize.width() - self.__arrowPadding, 0)
 
-            self.layout().setContentsMargins(0, 0, 0, self.__arrowPadding)
+            self.layout().setContentsMargins(0, 0, 0, self.__margin)
             self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
             self.layout().addWidget(self.labelArrow, 1, 0, 1, 1, self.__arrowAlign)
 
@@ -698,7 +706,7 @@ class QuickToolTip(QWidget):
                 self.__arrowSize.width() - self.__arrowPadding, self.__arrowSize.height()
             )
 
-            self.layout().setContentsMargins(0, self.__arrowPadding, 0, 0)
+            self.layout().setContentsMargins(0, self.__margin, 0, 0)
             self.layout().addWidget(self.labelArrow, 0, 0, 1, 1, self.__arrowAlign)
             self.layout().addWidget(self.mainWidget, 1, 0, 1, 1)
 
@@ -709,7 +717,7 @@ class QuickToolTip(QWidget):
             self.__painterPath.lineTo(0, self.__arrowSize.height() - self.__arrowPadding)
             self.__painterPath.lineTo(0, self.__arrowPadding)
 
-            self.layout().setContentsMargins(0, 0, self.__arrowPadding, 0)
+            self.layout().setContentsMargins(0, 0, self.__margin, 0)
             self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
             self.layout().addWidget(self.labelArrow, 0, 1, 1, 1, self.__arrowAlign)
 
@@ -722,7 +730,7 @@ class QuickToolTip(QWidget):
             )
             self.__painterPath.lineTo(self.__arrowSize.width(), self.__arrowPadding)
 
-            self.layout().setContentsMargins(self.__arrowPadding, 0, 0, 0)
+            self.layout().setContentsMargins(self.__margin, 0, 0, 0)
             self.layout().addWidget(self.labelArrow, 0, 0, 1, 1, self.__arrowAlign)
             self.layout().addWidget(self.mainWidget, 0, 1, 1, 1)
 
@@ -732,10 +740,16 @@ class QuickToolTip(QWidget):
         self.mainWidget.adjustSize()
 
         if self.__alignment in (Qt.AlignTop, Qt.AlignBottom):
-            return QSize(self.mainWidget.width(), self.mainWidget.height() + self.__margin)
+            return QSize(
+                self.mainWidget.width(),
+                self.mainWidget.height() + self.__arrowSize.height() + self.__margin
+            )
 
         elif self.__alignment in (Qt.AlignLeft, Qt.AlignRight):
-            return QSize(self.mainWidget.width() + self.__margin, self.mainWidget.height())
+            return QSize(
+                self.mainWidget.width() + self.__arrowSize.width() + self.__margin,
+                self.mainWidget.height()
+            )
 
     def __arrow_draw(self):
         pix = QPixmap(self.labelArrow.size())
@@ -759,7 +773,7 @@ class QuickToolTip(QWidget):
         if self.__timeout:
             self.__timer.count = 0
             self.__timer.stop()
-        
+
         super(QuickToolTip, self).hideEvent(event)
 
     def exec_(self, target):
@@ -768,39 +782,23 @@ class QuickToolTip(QWidget):
         y = point.y()
         size = self.__size()
 
-        if self.__alignment is Qt.AlignTop:
-            y -= size.height()
+        if self.__alignment in (Qt.AlignTop, Qt.AlignBottom):
+            y = y - size.height() if self.__alignment is Qt.AlignTop else y + target.height()
+
             if self.__arrowAlign is Qt.AlignLeft:
                 x -= self.__arrowPadding
             elif self.__arrowAlign is Qt.AlignRight:
-                x += target.width() + self.__arrowPadding - size.width()
+                x += (target.width() + self.__arrowPadding) - size.width()
             elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignHCenter):
                 x += (target.width() / 2) - (size.width() / 2)
 
-        elif self.__alignment is Qt.AlignBottom:
-            y += target.height()
-            if self.__arrowAlign is Qt.AlignLeft:
-                x -= self.__arrowPadding
-            elif self.__arrowAlign is Qt.AlignRight:
-                x += target.width() + self.__arrowPadding - size.width()
-            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignHCenter):
-                x += (target.width() / 2) - (size.width() / 2)
+        elif self.__alignment in (Qt.AlignLeft, Qt.AlignRight):
+            x = x - size.width() if self.__alignment is Qt.AlignLeft else x + target.width()
 
-        elif self.__alignment is Qt.AlignLeft:
-            x -= size.width()
             if self.__arrowAlign is Qt.AlignTop:
                 y -= self.__arrowPadding
             elif self.__arrowAlign is Qt.AlignBottom:
-                y += target.height() + self.__arrowPadding - size.height()
-            elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignVCenter):
-                y += (target.height() / 2) - (size.height() / 2)
-
-        elif self.__alignment is Qt.AlignRight:
-            x += target.width()
-            if self.__arrowAlign is Qt.AlignTop:
-                y -= self.__arrowPadding
-            elif self.__arrowAlign is Qt.AlignBottom:
-                y += target.height() + self.__arrowPadding - size.height()
+                y += (target.height() + self.__arrowPadding) - size.height()
             elif self.__arrowAlign in (Qt.AlignCenter, Qt.AlignVCenter):
                 y += (target.height() / 2) - (size.height() / 2)
 
