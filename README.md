@@ -66,6 +66,7 @@ SECPure.manifest
 None    text_ellipsis(
           QObject target,
           Qt.TextElideMode mode=Qt.ElideRight,
+          bool tooltip=False
           int width=None
         )
 ```
@@ -359,7 +360,7 @@ QWidget   QuickToolTip(
             Qt.AlignmentFlag arrow_align=Qt.AlignCenter,
             QSize arrow_size=QSize(15, 8),
             int arrow_padding=15,
-            int margin=11,
+            int margin=10,
             int timeout=1000
           )
 ```
