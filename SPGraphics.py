@@ -504,12 +504,12 @@ class QuickMainWidget(QWidget):
         self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
 
         if fixed_size:
-            self.setFixedSize(fixed_size)
+            self.mainWidget.setFixedSize(fixed_size)
         elif fixed_width or fixed_height:
             if fixed_width:
-                self.setFixedWidth(fixed_width)
+                self.mainWidget.setFixedWidth(fixed_width)
             if fixed_height:
-                self.setFixedHeight(fixed_height)
+                self.mainWidget.setFixedHeight(fixed_height)
         else:
             self.sizeGrip = QSizeGrip(self)
             self.sizeGrip.setFixedSize(QSize(24, 24))
@@ -551,12 +551,12 @@ class QuickMenu(QMenu):
         self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
 
         if fixed_size:
-            self.setFixedSize(fixed_size)
+            self.mainWidget.setFixedSize(fixed_size)
         elif fixed_width or fixed_height:
             if fixed_width:
-                self.setFixedWidth(fixed_width)
+                self.mainWidget.setFixedWidth(fixed_width)
             if fixed_height:
-                self.setFixedHeight(fixed_height)
+                self.mainWidget.setFixedHeight(fixed_height)
         elif resizable:
             self.sizeGrip = QSizeGrip(self)
             self.sizeGrip.setFixedSize(QSize(24, 24))
@@ -616,12 +616,12 @@ class QuickDialog(QDialog):
         self.layout().addWidget(self.mainWidget, 0, 0, 1, 1)
 
         if fixed_size:
-            self.setFixedSize(fixed_size)
+            self.mainWidget.setFixedSize(fixed_size)
         elif fixed_width or fixed_height:
             if fixed_width:
-                self.setFixedWidth(fixed_width)
+                self.mainWidget.setFixedWidth(fixed_width)
             if fixed_height:
-                self.setFixedHeight(fixed_height)
+                self.mainWidget.setFixedHeight(fixed_height)
         else:
             self.sizeGrip = QSizeGrip(self)
             self.sizeGrip.setFixedSize(QSize(24, 24))
