@@ -1168,7 +1168,7 @@ class QuickPushButton(QPushButton):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None,
+            cursor: Qt.CursorShape = Qt.PointingHandCursor,
             tooltip: QuickToolTip = None
     ):
         super(QuickPushButton, self).__init__(parent)
@@ -1245,7 +1245,7 @@ class QuickRadioButton(QRadioButton):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None,
+            cursor: Qt.CursorShape = Qt.PointingHandCursor,
             tooltip: QuickToolTip = None
     ):
         super(QuickRadioButton, self).__init__(parent)
@@ -1326,7 +1326,7 @@ class QuickCheckBox(QCheckBox):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None,
+            cursor: Qt.CursorShape = Qt.PointingHandCursor,
             tooltip: QuickToolTip = None
     ):
         super(QuickCheckBox, self).__init__(parent)
@@ -1407,7 +1407,7 @@ class QuickDateEdit(QDateEdit):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None,
+            cursor: Qt.CursorShape = Qt.PointingHandCursor,
             tooltip: QuickToolTip = None
     ):
         super(QuickDateEdit, self).__init__(parent)
@@ -1563,7 +1563,7 @@ class QuickComboBox(QComboBox):
             start_value: object = None,
             end_value: object = None,
             duration: int = 300,
-            cursor: Qt.CursorShape = None,
+            cursor: Qt.CursorShape = Qt.PointingHandCursor,
             tooltip: QuickToolTip = None
     ):
         super(QuickComboBox, self).__init__(parent)
