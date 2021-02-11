@@ -810,6 +810,54 @@ class QuickToolTip(QWidget):
             self.__timer.start(1000)
 
 
+class QuickListWidgetItem(QWidget):
+    def __init__(
+            self, parent=None,
+            value_changed: callable = None,
+            start_value: object = None,
+            end_value: object = None,
+            duration: int = 300,
+            tooltip: QuickToolTip = None
+    ):
+        super(QuickListWidgetItem, self).__init__(parent, flags=Qt.SubWindow)
+
+        self.item = QListWidgetItem()
+        self.__tooltip = tooltip
+
+        if callable(value_changed) and start_value and end_value:
+            self.__animation = QVariantAnimation(self)
+            self.__animation.valueChanged.connect(value_changed)
+            self.__animation.setStartValue(start_value)
+            self.__animation.setEndValue(end_value)
+            self.__animation.setDuration(duration)
+        else:
+            self.__animation = None
+
+    def enterEvent(self, event):
+        super(QuickListWidgetItem, self).enterEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Forward)
+            self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.exec_(self)
+
+    def leaveEvent(self, event):
+        super(QuickListWidgetItem, self).leaveEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Backward)
+            self.__animation.start()
+
+        if self.__tooltip:
+            self.__tooltip.hide()
+
+    def size_update(self):
+        self.adjustSize()
+        self.item.setSizeHint(self.sizeHint())
+
+
 class QuickListWidget(QListWidget):
     def __init__(
             self, parent=None,
