@@ -810,6 +810,132 @@ class QuickToolTip(QWidget):
             self.__timer.start(1000)
 
 
+class QuickListWidget(QListWidget):
+    def __init__(
+            self, parent=None,
+            edit_triggers: QAbstractItemView.EditTrigger = QAbstractItemView.NoEditTriggers,
+            selection_mode: QAbstractItemView.SelectionMode = QAbstractItemView.NoSelection,
+            scroll_mode: QAbstractItemView.ScrollMode = QAbstractItemView.ScrollPerPixel,
+            resize_mode: QListView.ResizeMode = QListView.Fixed,
+            view_mode: QListView.ViewMode = QListView.ListMode,
+            movement: QListView.Movement = QListView.Static,
+            icon_size: QSize = None,
+            grid_size: QSize = None,
+            spacing: int = None,
+            scroll_step: int = 10,
+            empty_illustration: QPixmap = None,
+            empty_title: str = None,
+            empty_description: str = None,
+            empty_customize: QWidget = None,
+            fixed_size: QSize = None,
+            fixed_width: int = None,
+            fixed_height: int = None,
+            value_changed: callable = None,
+            start_value: object = None,
+            end_value: object = None,
+            duration: int = 300
+    ):
+        super(QuickListWidget, self).__init__(parent)
+
+        self.setFocusPolicy(Qt.NoFocus)
+        self.setEditTriggers(edit_triggers)
+        self.setSelectionMode(selection_mode)
+        self.setVerticalScrollMode(scroll_mode)
+        self.setHorizontalScrollMode(scroll_mode)
+        self.setResizeMode(resize_mode)
+        self.setViewMode(view_mode)
+        self.setMovement(movement)
+        self.horizontalScrollBar().setCursor(Qt.PointingHandCursor)
+        self.verticalScrollBar().setCursor(Qt.PointingHandCursor)
+        smooth_scroll(self, scroll_step)
+
+        if icon_size:
+            self.setIconSize(icon_size)
+
+        if grid_size:
+            self.setGridSize(grid_size)
+
+        if spacing:
+            self.setSpacing(spacing)
+
+        if empty_illustration:
+            self.labelIllustration = QLabel(self)
+            self.labelIllustration.setPixmap(empty_illustration)
+            self.labelIllustration.setObjectName('labelIllustration')
+
+            self.labelTitle = QLabel(self)
+            if empty_title:
+                self.labelTitle.setText(empty_title)
+            self.labelTitle.setObjectName('labelTitle')
+
+            self.labelDescription = QLabel(self)
+            if empty_description:
+                self.labelDescription.setText(empty_description)
+            self.labelDescription.setWordWrap(True)
+            self.labelDescription.setObjectName('labelDescription')
+
+            self.model().rowsInserted.connect(self.__item_changed)
+            self.model().rowsRemoved.connect(self.__item_changed)
+
+            self.setLayout(QVBoxLayout())
+            self.layout().addWidget(self.labelIllustration)
+            self.layout().addWidget(self.labelTitle)
+            self.layout().addWidget(self.labelDescription)
+
+        elif empty_customize:
+            self.model().rowsInserted.connect(self.__item_changed)
+            self.model().rowsRemoved.connect(self.__item_changed)
+
+            self.setLayout(QGridLayout())
+            self.layout().addWidget(empty_customize, 0, 0, 1, 1)
+
+        if fixed_size:
+            self.setFixedSize(fixed_size)
+        else:
+            if fixed_width:
+                self.setFixedWidth(fixed_width)
+            if fixed_height:
+                self.setFixedHeight(fixed_height)
+
+        if callable(value_changed) and start_value and end_value:
+            self.__animation = QVariantAnimation(self)
+            self.__animation.valueChanged.connect(value_changed)
+            self.__animation.setStartValue(start_value)
+            self.__animation.setEndValue(end_value)
+            self.__animation.setDuration(duration)
+        else:
+            self.__animation = None
+
+    def enterEvent(self, event):
+        super(QuickListWidget, self).enterEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Forward)
+            self.__animation.start()
+
+    def leaveEvent(self, event):
+        super(QuickListWidget, self).leaveEvent(event)
+
+        if self.__animation:
+            self.__animation.setDirection(QAbstractAnimation.Backward)
+            self.__animation.start()
+
+    def __item_changed(self):
+        if self.count():
+            self.labelIllustration.hide()
+            self.labelTitle.hide()
+            self.labelDescription.hide()
+
+        else:
+            self.labelIllustration.show()
+            self.labelTitle.show()
+            self.labelDescription.show()
+
+    def add_quick_item(self, item: QuickListWidgetItem):
+        self.addItem(item.item)
+        self.setItemWidget(item.item, item)
+
+
 class QuickLineEdit(QLineEdit):
     def __init__(
             self, parent=None,
