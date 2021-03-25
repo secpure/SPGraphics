@@ -1037,7 +1037,6 @@ class QuickLineEdit(QLineEdit):
         if layout_support:
             self.setLayout(QHBoxLayout())
             self.layout().setContentsMargins(10, 0, 10, 0)
-            self.layout().setSpacing(0)
 
         if callable(value_changed) and start_value and end_value:
             self.__animation = QVariantAnimation(self)
@@ -1179,8 +1178,9 @@ class QuickPushButton(QPushButton):
 
         if icon:
             self.setIcon(icon)
-            if icon_size:
-                self.setIconSize(icon_size)
+            
+        if icon_size:
+            self.setIconSize(icon_size)
 
         if fixed_size:
             self.setFixedSize(fixed_size)
@@ -1256,8 +1256,9 @@ class QuickRadioButton(QRadioButton):
 
         if icon:
             self.setIcon(icon)
-            if icon_size:
-                self.setIconSize(icon_size)
+            
+        if icon_size:
+            self.setIconSize(icon_size)
 
         if fixed_size:
             self.setFixedSize(fixed_size)
@@ -1338,8 +1339,9 @@ class QuickCheckBox(QCheckBox):
 
         if icon:
             self.setIcon(icon)
-            if icon_size:
-                self.setIconSize(icon_size)
+            
+        if icon_size:
+            self.setIconSize(icon_size)
 
         if fixed_size:
             self.setFixedSize(fixed_size)
@@ -1606,6 +1608,7 @@ class QuickComboBox(QComboBox):
 
         if cursor:
             self.setCursor(cursor)
+            self.view().setCursor(cursor)
 
         if callable(value_changed) and start_value and end_value:
             self.__animation = QVariantAnimation(self)
