@@ -2186,6 +2186,7 @@ class _MessageBoxPasswordKernel(_MessageBoxKernel):
             mode=QLineEdit.Password, fixed_height=41
         )
         self.lineEdit.setFocusPolicy(Qt.ClickFocus)
+        self.lineEdit.textChanged.connect(self.__line_edit_changed_redirect)
         self.lineEdit.setObjectName('lineEdit')
 
         self.pushButtonEye = QuickPushButton(
@@ -2198,6 +2199,7 @@ class _MessageBoxPasswordKernel(_MessageBoxKernel):
             self.frame, icon=QIcon(_Icon.ENTER), icon_size=_SIZE21,
             fixed_size=_SIZE41, cursor=Qt.PointingHandCursor
         )
+        self.pushButtonAccept.setDisabled(True)
         self.pushButtonAccept.setObjectName('pushButtonAccept')
 
         self.strengthBar = SPInputmanager.QStrengthBar(self.frame)
@@ -2216,6 +2218,24 @@ class _MessageBoxPasswordKernel(_MessageBoxKernel):
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
             self.pushButtonAccept.click()
+
+    @pyqtSlot(str)
+    def __line_edit_changed_redirect(self, text: str):
+        self.pushButtonClose.setDisabled(True)
+        self.pushButtonAccept.setDisabled(True)
+        QTimer().singleShot(1100, lambda: self.__line_edit_changed(text))
+
+    def __line_edit_changed(self, text: str):
+        status = False
+
+        if self.lineEdit.text() != text:
+            return
+
+        if text:
+            status = True
+
+        self.pushButtonClose.setEnabled(True)
+        self.pushButtonAccept.setEnabled(status)
 
 
 class MessageBox(_MessageBoxKernel):
