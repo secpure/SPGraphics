@@ -85,13 +85,13 @@ class _Color:
 
 
 class _Icon:
-    CLOSE = str()
-    ENTER = str()
-    EYE_SHOW = str()
-    INFORMATION = str()
-    WARNING = str()
-    SUCCESS = str()
-    FAILED = str()
+    CLOSE = QPixmap
+    ENTER = QPixmap
+    EYE_SHOW = QPixmap
+    INFORMATION = QPixmap
+    WARNING = QPixmap
+    SUCCESS = QPixmap
+    FAILED = QPixmap
 
 
 class State:
@@ -119,10 +119,10 @@ class State:
 class Setup:
     @staticmethod
     def set_icons(
-            eye_show: str, eye_hide: str, enter_button: str, close_button: str,
-            information_state: str, warning_state: str, success_state: str, failed_state: str
+            eye_show: QPixmap, eye_hide: QPixmap, enter_button: QPixmap, close_button: QPixmap,
+            information_state: QPixmap, warning_state: QPixmap, success_state: QPixmap, failed_state: QPixmap
     ):
-        """Set all icons as string path, EX: ':/images/icons/icon.png'"""
+        """Set all icons as QPixmap"""
 
         SPInputmanager.Setup.set_icons(eye_show, eye_hide)
 
@@ -1645,7 +1645,7 @@ class QuickComboBox(QComboBox):
 class QuickNotification(QListWidget):
     class _NotificationObject(QGroupBox):
         def __init__(
-                self, icon: str, text: str, font_size: int, color: str,
+                self, icon: QPixmap, text: str, font_size: int, color: str,
                 item: QListWidgetItem, timeout: int, finished: callable
         ):
             QGroupBox.__init__(self)
@@ -1655,7 +1655,7 @@ class QuickNotification(QListWidget):
 
             label_icon = QuickLabel(
                 self, scaled=True, fixed_size=_SIZE25,
-                pixmap=QPixmap(icon), align=Qt.AlignCenter
+                pixmap=icon, align=Qt.AlignCenter
             )
 
             label_text = QuickLabel(self, text, font_size=font_size)
@@ -1710,7 +1710,7 @@ class QuickNotification(QListWidget):
         self.__style = stylesheet
 
     def create_new(
-            self, icon: str, text: str, font_size: int = None, color: str = None,
+            self, icon: QPixmap, text: str, font_size: int = None, color: str = None,
             timeout: int = 1500, finished: callable = None
     ):
         if not self.count():
@@ -2056,7 +2056,7 @@ class _MessageBoxKernel(QDialog):
         self.content_update(text, _Icon.WARNING, _Color.WARNING, close)
 
     def content_update(
-            self, text: str = None, icon: str = None, color: str = None, close: bool = False
+            self, text: str = None, icon: [str, QPixmap] = None, color: str = None, close: bool = False
     ):
         """Content update values"""
 
@@ -2064,13 +2064,13 @@ class _MessageBoxKernel(QDialog):
             300, lambda: self.__content_updating(text, icon, color, close)
         ).start()
 
-    def __content_updating(self, text: str, icon: str, color: str, close: bool):
+    def __content_updating(self, text: str, icon: [str, QPixmap], color: str, close: bool):
         self.__opacityMessage.finished.disconnect()
         self.__opacityMessage.temp_show(500, lambda: self.__content_updated(close))
 
-        if icon:
+        if isinstance(icon, QPixmap):
             self.labelMessage.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            self.labelIcon.setPixmap(QPixmap(icon))
+            self.labelIcon.setPixmap(icon)
             self.labelIcon.show()
         elif icon == '':
             self.labelMessage.setAlignment(Qt.AlignCenter)
@@ -2147,7 +2147,7 @@ class _MessageBoxKernel(QDialog):
         self.clickedOn = Button.CLOSE
         self.close()
 
-    def _set(self, window_size: QSize, icon: str, text: str, font_size: int, color: str):
+    def _set(self, window_size: QSize, icon: QPixmap, text: str, font_size: int, color: str):
         self.resize(window_size.width() + 41, window_size.height() + 41)
 
         self.__frame.setFixedSize(window_size)
@@ -2161,7 +2161,7 @@ class _MessageBoxKernel(QDialog):
         self.labelMessage.setStyleSheet('color: %s;' % color)
 
         if icon:
-            self.labelIcon.setPixmap(QPixmap(icon))
+            self.labelIcon.setPixmap(icon)
         else:
             self.labelMessage.setAlignment(Qt.AlignCenter)
             self.labelIcon.hide()
@@ -2240,7 +2240,7 @@ class _MessageBoxPasswordKernel(_MessageBoxKernel):
 
 class MessageBox(_MessageBoxKernel):
     def __init__(
-            self, parent, text: str, icon: str = None, font_size: int = None,
+            self, parent, text: str, icon: QPixmap = None, font_size: int = None,
             color: str = _Color.FONT, window_size: QSize = _WINDOW_SIZE
     ):
         """Simple message display"""
@@ -2251,7 +2251,7 @@ class MessageBox(_MessageBoxKernel):
 
 class MessageBoxConfirm(_MessageBoxKernel):
     def __init__(
-            self, parent, text: str, icon: str = None, font_size: int = None,
+            self, parent, text: str, icon: QPixmap = None, font_size: int = None,
             color: str = _Color.FONT, accept: str = "Accept",
             cancel: str = "Cancel", window_size: QSize = _WINDOW_SIZE
     ):
@@ -2296,7 +2296,7 @@ class MessageBoxConfirm(_MessageBoxKernel):
 
 class MessageBoxPassword(_MessageBoxPasswordKernel):
     def __init__(
-            self, parent, text: str, icon: str = None, font_size: int = None,
+            self, parent, text: str, icon: QPixmap = None, font_size: int = None,
             color: str = _Color.FONT, window_size: QSize = _WINDOW_SIZE
     ):
         """Message for password input"""
@@ -2318,7 +2318,7 @@ class MessageBoxPassword(_MessageBoxPasswordKernel):
 
 class MessageBoxPasswordConfirm(_MessageBoxPasswordKernel):
     def __init__(
-            self, parent, text: str, password: str, icon: str = None, font_size: int = None,
+            self, parent, text: str, password: str, icon: QPixmap = None, font_size: int = None,
             color: str = _Color.FONT, window_size: QSize = _WINDOW_SIZE
     ):
         """Message confirmation password"""
@@ -2347,7 +2347,7 @@ class MessageBoxPasswordConfirm(_MessageBoxPasswordKernel):
 class MessageBoxPasswordMatching(_MessageBoxPasswordKernel):
     def __init__(
             self, parent, text: str, text_again: str, text_weak_password: str = None,
-            password_score: int = 50, icon: str = None, font_size: int = None,
+            password_score: int = 50, icon: QPixmap = None, font_size: int = None,
             color: str = _Color.FONT, window_size: QSize = _WINDOW_SIZE
     ):
         """Message match password"""
@@ -2404,7 +2404,7 @@ class MessageBoxProgress(_MessageBoxKernel):
     def __init__(
             self, parent, text: str, core: callable, finished: callable = None,
             gui: callable = None, auto_run: bool = True, closable: bool = True,
-            icon: str = None, font_size: int = None, color: str = _Color.FONT,
+            icon: QPixmap = None, font_size: int = None, color: str = _Color.FONT,
             window_size: QSize = _WINDOW_SIZE
     ):
         """Message for progress operation"""
@@ -2458,7 +2458,7 @@ class MessageBoxLoading(_MessageBoxKernel):
     def __init__(
             self, parent, text: str, core: callable, finished: callable = None,
             gui: callable = None, auto_run: bool = True, closable: bool = True,
-            icon: str = None, font_size: int = None, color: str = _Color.FONT,
+            icon: QPixmap = None, font_size: int = None, color: str = _Color.FONT,
             window_size: QSize = _WINDOW_SIZE
     ):
         """Message for loading operation"""
